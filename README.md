@@ -1,26 +1,26 @@
-##  Contexto del Dominio
+## 2. Contexto del Dominio
 
 ### Problema que Resuelve
 
 El sistema de **Gestión de Delivery** aborda los desafíos de la coordinación logística moderna, un dominio que requiere:
 
-* **1. Manejo del Ciclo de Vida del Pedido:**
+1.  **Manejo del Ciclo de Vida del Pedido:**
     * Un pedido no es un objeto estático; transiciona por múltiples estados (`Pendiente`, `En Preparación`, `Listo`, `En Camino`, `Entregado`).
     * Las acciones permitidas (ej. `cancelar`) deben fallar o tener éxito dependiendo del estado actual.
 
-* **2. Coordinación de Actores en Tiempo Real:**
+2.  **Coordinación de Actores en Tiempo Real:**
     * Existen tres roles (`Cliente`, `Restaurante`, `Repartidor`) que deben estar sincronizados sin estar fuertemente acoplados.
     * Un cambio de estado en el `Pedido` (hecho por el Restaurante) debe notificar automáticamente al `Cliente` y al `Sistema de Repartidores`.
 
-* **3. Asignación Logística (Recursos):**
+3.  **Asignación Logística (Recursos):**
     * El sistema debe asignar un `Repartidor` disponible y cercano cuando un pedido está `Listo para Recoger`.
     * Requiere algoritmos intercambiables para decidir la asignación (ej. "más cercano" vs. "con menos pedidos").
 
-* **4. Flexibilidad de Transacciones:**
+4.  **Flexibilidad de Transacciones:**
     * El costo final de un pedido no es fijo; debe permitir agregar "extras" opcionales de forma dinámica (`Envío Prioritario`, `Propina`, `Seguro`).
     * Evitar una "explosión de clases" (`PedidoConPropina`, `PedidoPrioritario`, etc.).
 
-* **5. Trazabilidad y Auditoría:**
+5.  **Trazabilidad y Auditoría:**
     * Almacenamiento del historial de estados de un pedido.
     * Gestión de diferentes tipos de usuarios (`Cliente`, `Repartidor`) con diferentes propiedades.
 

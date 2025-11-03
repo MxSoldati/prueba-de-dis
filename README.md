@@ -370,3 +370,81 @@ class ServicioLogistica:
 * **Algoritmos Intercambiables (OCP):** Se puede añadir `EstrategiaMejorRating` sin tocar `ServicioLogistica`.
 * **Desacoplamiento (DIP):** El servicio depende de la interfaz `IEstrategiaAsignacion`, no de una implementación concreta.
 * **Flexibilidad:** Permite cambiar el comportamiento del sistema en tiempo de ejecución (ej. usar una estrategia diferente en horas pico).
+
+## Uso del Sistema
+
+### Ejecutar Simulación
+
+Para correr la simulación del sistema y ver la demo de los patrones de diseño en acción, ejecute:
+
+~~~bash
+python main.py
+~~~
+
+**Salida esperada:**
+
+La consola mostrará la traza de ejecución del `main.py`, demostrando cómo la Vista (main) se comunica con el Servicio (Controlador) y cómo los patrones (State, Observer, etc.) manejan la lógica de negocio.
+
+~~~
+================================================================================
+|| INICIO DE SIMULACIÓN: SISTEMA DE PEDIDOS (V2 CON SERVICIOS) ||
+================================================================================
+
+VISTA: Solicitando al servicio crear un pedido...
+SERVICIO: Recibida orden para crear pedido para Valentín.
+PEDIDO 101: Transicionando a -> Pendiente de Aprobación
+SERVICIO: Pedido 101 creado con estado 'Pendiente de Aprobación'
+VISTA: Pedido 101 creado.
+VISTA: Consultando estado: Pendiente de Aprobación
+
+   [... APLICANDO PATRÓN STATE ...]
+   [... Probando cancelación en estado 'Pendiente' ...]
+
+VISTA: Solicitando al servicio cancelar el pedido 101...
+SERVICIO: Intentando cancelar pedido 101...
+ACCIÓN: El cliente canceló el pedido 101 (estaba pendiente).
+... (Lógica de cancelación ejecutada) ...
+VISTA: Consultando estado: Pendiente de Aprobación
+
+--------------------------------------------------------------------------------
+
+VISTA: Solicitando al servicio crear un segundo pedido...
+SERVICIO: Recibida orden para crear pedido para Alberto (Profe).
+PEDIDO 102: Transicionando a -> Pendiente de Aprobación
+SERVICIO: Pedido 102 creado con estado 'Pendiente de Aprobación'
+VISTA: Pedido 102 creado.
+VISTA: Consultando estado: Pendiente de Aprobación
+
+   [... APLICANDO PATRÓN STATE ...]
+   [... Avanzando el estado del pedido ...]
+
+VISTA: Solicitando al servicio avanzar el pedido 102...
+SERVICIO: Avanzando estado del pedido 102...
+ACCIÓN: El restaurante aprobó el pedido 102.
+PEDIDO 102: Transicionando a -> En Preparación
+VISTA: Consultando estado: En Preparación
+
+   [... APLICANDO PATRÓN STATE ...]
+   [... Probando cancelación en estado 'En Preparación' ...]
+
+VISTA: Solicitando al servicio cancelar el pedido 102...
+SERVICIO: Intentando cancelar pedido 102...
+ERROR: No se puede cancelar el pedido 102, ¡ya está en preparación!
+VISTA: Consultando estado: En Preparación
+
+================================================================================
+|| FIN DE LA SIMULACIÓN ||
+================================================================================
+
+   ✓ Demostrado: La VISTA (main) habla con el SERVICIO (controlador).
+   ✓ Demostrado: El SERVICIO (controlador) habla con el MODELO (entidad).
+   ✓ Demostrado: El Patrón STATE sigue funcionando perfectamente.
+~~~
+
+### Generación del Integrador (Entrega Final)
+
+Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporcionado por la cátedra) para consolidar todo el código fuente en un único archivo `integradorFinal.py`.
+
+~~~bash
+python buscar_paquete.py integrar ParcialDelivery
+~~~

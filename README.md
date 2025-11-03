@@ -531,7 +531,7 @@ Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporciona
 python buscar_paquete.py integrar ParcialDelivery
 ~~~
 
-## 7. Estructura del Proyecto
+## Estructura del Proyecto
 
 El proyecto sigue una arquitectura de N-Capas, separando las responsabilidades en paquetes y módulos.
 
@@ -639,3 +639,19 @@ ParcialDelivery/
         +-- pedido_exception.py      # Errores de Pedido (ej. CancelarException)
         +-- usuario_exception.py     # Errores de Usuario
 ~~~
+
+## Módulos del Sistema
+
+El proyecto se organiza en los siguientes paquetes y módulos principales dentro de `parcial_delivery/`:
+
+* **`main.py`:** Punto de entrada del sistema. Actúa como la **Vista** (Capa de Presentación) y ejecuta la simulación completa del `README.md`.
+
+* **`entidades/`:** Paquete que contiene el **Modelo**. Son clases `@dataclass` (DTOs) que representan los objetos de negocio (`Pedido`, `Cliente`, `Repartidor`) sin lógica de negocio.
+
+* **`servicios/`:** Paquete que actúa como **Controlador**. Contiene la lógica de negocio central (`ServicioPedidos`, `ServicioLogistica`). Orquesta las entidades y los patrones para cumplir con las operaciones.
+
+* **`patrones/`:** Paquete "caja de herramientas". Contiene las implementaciones genéricas y reutilizables de todos los patrones de diseño (`State`, `Observer`, `Factory`, `Decorator`, `Strategy`).
+
+* **`notificaciones/`:** Paquete que contiene implementaciones concretas del patrón **Observer** (`NotificadorCliente`, `DashboardAdmin`). Son las clases que "escuchan" los eventos emitidos por el `Pedido`.
+
+* **`excepciones/`:** Paquete que define las excepciones personalizadas del dominio (ej. `PedidoCanceladoException`), permitiendo un manejo de errores robusto.

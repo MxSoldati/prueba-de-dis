@@ -1,57 +1,39 @@
 # /parcial_delivery/entidades/pedidos/pedido.py
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Tuple # ¡Añadir Tuple!
 
-# --- Importaciones del Patrón State ---
+# ... (importaciones de State y Observer) ...
 from parcial_delivery.patrones.state.i_estado_pedido import IEstadoPedido
 from parcial_delivery.patrones.state.impl.estado_pendiente import EstadoPendiente
-
-# --- ¡NUEVAS Importaciones del Patrón Observer! ---
 from parcial_delivery.patrones.observer.observable import Observable
-# --------------------------------------------------
 
 @dataclass
-class Pedido(Observable): # <-- ¡AHORA HEREDA DE OBSERVABLE!
-    """
-    La entidad principal. Actúa como:
-    1. Contexto (para el Patrón State)
-    2. Sujeto (para el Patrón Observer)
-    """
+class Pedido(Observable): 
+    # ... (atributos id_pedido, cliente, items, costo_base) ...
     id_pedido: int
     cliente: str 
     items: List[str]
     costo_base: float
     
+    # --- NUEVO CAMPO PARA PATRÓN STRATEGY ---
+    ubicacion_restaurante: Tuple[int, int] = field(default=(0, 0))
+    # ----------------------------------------
+    
     estado_actual: Optional[IEstadoPedido] = field(init=False, repr=False, default=None)
 
+    # ... (el resto de la clase: __post_init__, transicionar_a, etc. quedan igual) ...
     def __post_init__(self):
-        """
-        Se ejecuta después del __init__ de @dataclass.
-        """
-        # Inicializa el 'Observable' (el Sujeto)
         Observable.__init__(self) 
-        
-        # Asigna el estado inicial
         if self.estado_actual is None:
             self.transicionar_a(EstadoPendiente(self))
 
-    # --- Métodos del Patrón State ---
-    
     def transicionar_a(self, nuevo_estado: IEstadoPedido):
-        """
-        El método central que permite al Pedido (Contexto) cambiar de estado.
-        """
         nombre_estado = "desconocido"
         if nuevo_estado:
             nombre_estado = nuevo_estado.get_nombre_estado()
-            
         print(f"PEDIDO {self.id_pedido}: Transicionando a -> {nombre_estado}")
         self.estado_actual = nuevo_estado
-        
-        # --- ¡MAGIA DEL OBSERVER! ---
-        # Notifica a todos los suscriptores sobre este cambio de estado.
         self.notificar(evento="CAMBIO_ESTADO", datos=self)
-        # -----------------------------
 
     def avanzar(self):
         self.estado_actual.avanzar_estado()

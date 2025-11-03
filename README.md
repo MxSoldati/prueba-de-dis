@@ -1,4 +1,4 @@
-## 2. Contexto del Dominio
+## Contexto del Dominio
 
 ### Problema que Resuelve
 
@@ -32,7 +32,7 @@ El sistema de **Gestión de Delivery** aborda los desafíos de la coordinación 
 * **Sistema (Backend):** Orquesta la comunicación, ejecuta la lógica de negocio (asignación, cálculo de costos) y persiste los datos.
 
 ### Flujo de Operaciones Típico
-
+~~~
 1.  **CREACIÓN (Factory):** Un `Cliente` crea un `Pedido` a través del sistema.
 2.  **TRANSICIÓN (State):** El `Restaurante` acepta el pedido. El estado cambia a `En Preparación`.
 3.  **BLOQUEO (State):** El `Cliente` intenta `cancelar` el pedido, pero el sistema lo rechaza porque ya está en preparación.
@@ -44,3 +44,4 @@ El sistema de **Gestión de Delivery** aborda los desafíos de la coordinación 
 7.  **ENTREGA (State):** El `Repartidor` acepta, recoge y entrega el pedido. El estado final es `Entregado`.
 8.  **CÁLCULO (Decorator):** El sistema calcula el costo final "envolviendo" el costo base con `CostoPropina` y `CostoPrioritario`.
 9.  **CIERRE:** El pedido se marca como finalizado.
+~~~

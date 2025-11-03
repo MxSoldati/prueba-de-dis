@@ -1,3 +1,10 @@
+# Parcial Patrones de Diseño - Sistema de Gestión de Delivery
+**Autor:** [Tu Apellido, Nombre]
+**Materia:** [Nombre de la Materia]
+**Profesor:** [Nombre del Profesor]
+
+---
+
 ## Contexto del Dominio
 
 ### Problema que Resuelve
@@ -46,6 +53,29 @@ El sistema de **Gestion de Delivery** aborda los desafios de la coordinacion log
 9. CIERRE: El pedido se marca como finalizado.
 ~~~
 
+---
+
+## Historias de Usuario (HU)
+
+Las siguientes historias de usuario (HU) definen los problemas específicos que los patrones de diseño resuelven:
+
+* **HU-1 (Manejo de Estado):**
+    > "Como **Cliente**, quiero poder **cancelar mi pedido** *solo si* todavía no fue aceptado o preparado por el restaurante."
+
+* **HU-2 (Notificaciones):**
+    > "Como **Cliente**, quiero **recibir notificaciones** automáticas (Push/SMS) cuando mi pedido cambia de estado (ej. 'En Preparación', 'En Camino'), para saber en todo momento dónde está mi comida."
+
+* **HU-3 (Flexibilidad de Costos):**
+    > "Como **Administrador**, quiero poder **añadir costos opcionales** (como 'Envío Prioritario' o 'Propina') al total de un pedido, para ofrecer servicios flexibles sin tener que crear 10 tipos de pedidos distintos."
+
+* **HU-4 (Creación de Entidades):**
+    > "Como **Sistema**, necesito poder **crear diferentes tipos de usuarios** (`Cliente`, `Repartidor`, `Admin`) de forma desacoplada, para que el sistema sea fácil de mantener a medida que se añaden nuevos roles."
+
+* **HU-5 (Algoritmos Intercambiables):**
+    > "Como **Sistema**, necesito poder **intercambiar el algoritmo** de asignación de repartidores (ej. 'más cercano' vs. 'más libre') fácilmente, para adaptarme a las condiciones del tráfico o a las horas pico."
+
+---
+
 ## Caracteristicas Principales
 
 ### Funcionalidades del Sistema
@@ -91,13 +121,15 @@ El sistema de **Gestion de Delivery** aborda los desafios de la coordinacion log
         * No se necesita crear clases como `PedidoConPropinaYPrioridad`.
 
 5.  **Logica de Asignacion Logistica (Patron Strategy)**
-    * **Algoritmos de asignacion intercambiables:**
+    * **Algoritmos de asignacion intercambiables (Resolucion de HU-5):**
         * Define una familia de algoritmos (Estrategias) para que el `SistemaLogistico` elija un repartidor.
         * El `ServicioLogistico` (Controlador) puede cambiar la estrategia dinamicamente (ej. usar una estrategia diferente en horas pico).
     * **Estrategias Concretas:**
         * `EstrategiaAsignarMasCercano`: Busca el `Repartidor` con menor distancia geografica al restaurante.
         * `EstrategiaAsignarMasLibre`: Busca el `Repartidor` con menos pedidos activos en su cola.
         * `EstrategiaAsignarPorRating`: (Opcional) Busca el `Repartidor` mejor calificado disponible.
+
+---
 
 ## Arquitectura del Sistema
 
@@ -134,9 +166,164 @@ El sistema está diseñado siguiendo los principios **SOLID** para asegurar un c
 
 El proyecto sigue una arquitectura limpia de N-Capas, donde la comunicación fluye en una sola dirección (Vista -> Controlador -> Modelo), similar a la estructura de `PythonForestal`.
 
+~~~
++-------------------------------------------------------------+
+|    PRESENTACION (main.py)    | (Demostracion CLI / Vista)   |
++-------------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------------+
+|   SERVICIOS (Controlador)    | (ServicioPedidos,            |
+|                              |  ServicioLogistica,          |
+|                              |  ServicioUsuarios)           |
++-------------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------------+
+|   ENTIDADES (Modelo)         | (Pedido, Cliente, Repartidor)|
++-------------------------------------------------------------+
+                           |
+                           v
++-------------------------------------------------------------+
+|   PATRONES / UTILIDADES      | (State, Observer, Factory,   |
+|                              |  Decorator, Strategy)        |
++-------------------------------------------------------------+
+~~~
+
+---
+
+## Estructura del Proyecto
+
+El proyecto sigue una arquitectura de N-Capas, separando las responsabilidades en paquetes y módulos.
+
+~~~
+ParcialDelivery/
+|
++-- main.py                      # Punto de entrada del sistema (Vista/Demo)
++-- README.md                    # Este archivo
++-- USER_STORIES.md              # (Opcional) Historias de usuario detalladas
++-- buscar_paquete.py            # Script integrador (proporcionado por cátedra)
+|
++-- .venv/                       # Entorno virtual Python
+|
++-- parcial_delivery/            # Paquete principal del sistema
+    |
+    +-- __init__.py
+    +-- constantes.py            # Constantes (ej. COSTO_PRIORITARIO, ESTADO_PENDIENTE)
+    |
+    +-- entidades/                 # Objetos de dominio (Modelo / DTOs)
+    |   +-- __init__.py
+    |   |
+    |   +-- usuarios/              # Entidades de usuarios
+    |   |   +-- __init__.py
+    |   |   +-- usuario.py         # Clase base (dataclass)
+    |   |   +-- cliente.py         # Entidad Cliente
+    |   |   +-- repartidor.py      # Entidad Repartidor
+    |   |   +-- admin.py           # Entidad AdminRestaurante
+    |   |
+    |   +-- pedidos/               # Entidades de pedidos
+    |   |   +-- __init__.py
+    |   |   +-- pedido.py          # Entidad Pedido (Contexto del Patrón State)
+    |   |   +-- item_pedido.py     # Entidad Item
+    |   |
+    |   +-- logistica/             # Entidades de logística
+    |       +-- __init__.py
+    |       +-- restaurante.py     # Entidad Restaurante
+    |       +-- vehiculo.py        # Entidad Vehiculo
+    |
+    +-- servicios/                 # Lógica de negocio (Controlador)
+    |   +-- __init__.py
+    |   |
+    |   +-- pedidos/               # Servicios de gestión de pedidos
+    |   |   +-- __init__.py
+    |   |   +-- servicio_pedidos.py  # (Servicio de Dominio)
+    |   |
+    |   +-- usuarios/              # Servicios de gestión de usuarios
+    |   |   +-- __init__.py
+    |   |   +-- servicio_usuarios.py # (Servicio de Dominio)
+    |   |
+    |   +-- logistica/             # Servicios de alto nivel
+    |       +-- __init__.py
+    |       +-- servicio_logistica.py # (Servicio de Negocio - usa Strategy)
+    |
+    +-- patrones/                  # Implementaciones de patrones de diseño
+    |   +-- __init__.py
+    |   |
+    |   +-- state/                 # Patron State (Ciclo de vida del Pedido)
+    |   |   +-- __init__.py
+    |   |   +-- i_estado_pedido.py   # Interfaz del Estado
+    |   |   +-- impl/                # Implementaciones concretas
+    |   |       +-- __init__.py
+    |   |       +-- estado_pendiente.py
+    |   |       +-- estado_en_preparacion.py
+    |   |       +-- estado_en_camino.py
+    |   |       +-- estado_entregado.py
+    |   |       +-- estado_cancelado.py
+    |   |
+    |   +-- observer/              # Patron Observer (Notificaciones)
+    |   |   +-- __init__.py
+    |   |   +-- observable.py        # Clase Sujeto/Observable[T]
+    |   |   +-- observer.py          # Interfaz Observador/Observer[T]
+    |   |   +-- eventos/             # DTOs de eventos
+    |   |       +-- __init__.py
+    |   |       +-- evento_pedido.py   # Evento (ej. "CAMBIO_ESTADO")
+    |   |
+    |   +-- factory/               # Patron Factory Method (Creación de Usuarios)
+    |   |   +-- __init__.py
+    |   |   +-- usuario_factory.py   # Fábrica de Usuarios
+    |   |
+    |   +-- decorator/             # Patron Decorator (Cálculo de Costos)
+    |   |   +-- __init__.py
+    |   |   +-- i_costo.py           # Interfaz del Componente (ICosto)
+    |   |   +-- impl/                # Implementaciones
+    |   |       +-- __init__.py
+    |   |       +-- costo_base.py      # Componente Concreto
+    |   |       +-- costo_propina.py   # Decorador Concreto
+    |   |       +-- costo_prioritario.py # Decorador Concreto
+    |   |
+    |   +-- strategy/              # Patron Strategy (Asignación Logística)
+    |       +-- __init__.py
+    |       +-- i_estrategia_asignacion.py # Interfaz Strategy
+    |       +-- impl/
+    |           +-- __init__.py
+    |           +-- estrategia_asignar_mas_cercano.py
+    |           +-- estrategia_asignar_mas_libre.py
+    |
+    +-- notificaciones/            # Subsistema de Notificaciones (Observadores)
+    |   +-- __init__.py
+    |   +-- notificador_cliente.py   # Observador Concreto (envía Push/SMS)
+    |   +-- dashboard_admin.py     # Observador Concreto (actualiza dashboard)
+    |
+    +-- excepciones/               # Excepciones personalizadas
+        +-- __init__.py
+        +-- delivery_exception.py    # Excepcion base
+        +-- pedido_exception.py      # Errores de Pedido (ej. CancelarException)
+        +-- usuario_exception.py     # Errores de Usuario
+~~~
+
+---
+
+## Módulos del Sistema
+
+El proyecto se organiza en los siguientes paquetes y módulos principales dentro de `parcial_delivery/`:
+
+* **`main.py`:** Punto de entrada del sistema. Actúa como la **Vista** (Capa de Presentación) y ejecuta la simulación completa del `README.md`.
+
+* **`entidades/`:** Paquete que contiene el **Modelo**. Son clases `@dataclass` (DTOs) que representan los objetos de negocio (`Pedido`, `Cliente`, `Repartidor`) sin lógica de negocio.
+
+* **`servicios/`:** Paquete que actúa como **Controlador**. Contiene la lógica de negocio central (`ServicioPedidos`, `ServicioLogistica`). Orquesta las entidades y los patrones para cumplir con las operaciones.
+
+* **`patrones/`:** Paquete "caja de herramientas". Contiene las implementaciones genéricas y reutilizables de todos los patrones de diseño (`State`, `Observer`, `Factory`, `Decorator`, `Strategy`).
+
+* **`notificaciones/`:** Paquete que contiene implementaciones concretas del patrón **Observer** (`NotificadorCliente`, `DashboardAdmin`). Son las clases que "escuchan" los eventos emitidos por el `Pedido`.
+
+* **`excepciones/`:** Paquete que define las excepciones personalizadas del dominio (ej. `PedidoCanceladoException`), permitiendo un manejo de errores robusto.
+
+---
+
 ## Patrones de Diseño Implementados
 
-A continuación, se detallan los 5 patrones de diseño implementados, su ubicación en el código y el problema específico que resuelven dentro del dominio del sistema. Elijo 5 patrones por si hay alguno que no le guste o le parezca basico...
+A continuación, se detallan los 5 patrones de diseño implementados, su ubicación en el código y el problema específico que resuelven dentro del dominio del sistema.
 
 ### 1. STATE Pattern (Estado)
 
@@ -365,11 +552,14 @@ class ServicioLogistica:
 * El sistema se inicia e inyecta una estrategia por defecto: `servicio_log = ServicioLogistica(EstrategiaAsignarMasCercano())`.
 * Cuando el `ModuloLogistica` (Observer) recibe un evento "ListoParaRecoger", llama a `servicio_log.asignar_repartidor_a_pedido(...)`.
 * El servicio delega la decisión a la estrategia `EstrategIAAsignarMasCercano`.
+* Resuelve la **Historia de Usuario HU-5**.
 
 **Ventajas:**
 * **Algoritmos Intercambiables (OCP):** Se puede añadir `EstrategiaMejorRating` sin tocar `ServicioLogistica`.
 * **Desacoplamiento (DIP):** El servicio depende de la interfaz `IEstrategiaAsignacion`, no de una implementación concreta.
 * **Flexibilidad:** Permite cambiar el comportamiento del sistema en tiempo de ejecución (ej. usar una estrategia diferente en horas pico).
+
+---
 
 ## Uso del Sistema
 
@@ -530,128 +720,3 @@ Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporciona
 ~~~bash
 python buscar_paquete.py integrar ParcialDelivery
 ~~~
-
-## Estructura del Proyecto
-
-El proyecto sigue una arquitectura de N-Capas, separando las responsabilidades en paquetes y módulos.
-
-~~~
-ParcialDelivery/
-|
-+-- main.py                      # Punto de entrada del sistema (Vista/Demo)
-+-- README.md                    # Este archivo
-+-- USER_STORIES.md              # (Pendiente) Historias de usuario detalladas
-+-- buscar_paquete.py            # Script integrador (proporcionado por cátedra)
-|
-+-- .venv/                       # Entorno virtual Python
-|
-+-- parcial_delivery/            # Paquete principal del sistema
-    |
-    +-- __init__.py
-    +-- constantes.py            # Constantes (ej. COSTO_PRIORITARIO, ESTADO_PENDIENTE)
-    |
-    +-- entidades/                 # Objetos de dominio (Modelo / DTOs)
-    |   +-- __init__.py
-    |   |
-    |   +-- usuarios/              # Entidades de usuarios
-    |   |   +-- __init__.py
-    |   |   +-- usuario.py         # Clase base (dataclass)
-    |   |   +-- cliente.py         # Entidad Cliente
-    |   |   +-- repartidor.py      # Entidad Repartidor
-    |   |   +-- admin.py           # Entidad AdminRestaurante
-    |   |
-    |   +-- pedidos/               # Entidades de pedidos
-    |   |   +-- __init__.py
-    |   |   +-- pedido.py          # Entidad Pedido (Contexto del Patrón State)
-    |   |   +-- item_pedido.py     # Entidad Item
-    |   |
-    |   +-- logistica/             # Entidades de logística
-    |       +-- __init__.py
-    |       +-- restaurante.py     # Entidad Restaurante
-    |       +-- vehiculo.py        # Entidad Vehiculo
-    |
-    +-- servicios/                 # Lógica de negocio (Controlador)
-    |   +-- __init__.py
-    |   |
-    |   +-- pedidos/               # Servicios de gestión de pedidos
-    |   |   +-- __init__.py
-    |   |   +-- servicio_pedidos.py  # (Servicio de Dominio)
-    |   |
-    |   +-- usuarios/              # Servicios de gestión de usuarios
-    |   |   +-- __init__.py
-    |   |   +-- servicio_usuarios.py # (Servicio de Dominio)
-    |   |
-    |   +-- logistica/             # Servicios de alto nivel
-    |       +-- __init__.py
-    |       +-- servicio_logistica.py # (Servicio de Negocio - usa Strategy)
-    |
-    +-- patrones/                  # Implementaciones de patrones de diseño
-    |   +-- __init__.py
-    |   |
-    |   +-- state/                 # Patron State (Ciclo de vida del Pedido)
-    |   |   +-- __init__.py
-    |   |   +-- i_estado_pedido.py   # Interfaz del Estado
-    |   |   +-- impl/                # Implementaciones concretas
-    |   |       +-- __init__.py
-    |   |       +-- estado_pendiente.py
-    |   |       +-- estado_en_preparacion.py
-    |   |       +-- estado_en_camino.py
-    |   |       +-- estado_entregado.py
-    |   |       +-- estado_cancelado.py
-    |   |
-    |   +-- observer/              # Patron Observer (Notificaciones)
-    |   |   +-- __init__.py
-    |   |   +-- observable.py        # Clase Sujeto/Observable[T]
-    |   |   +-- observer.py          # Interfaz Observador/Observer[T]
-    |   |   +-- eventos/             # DTOs de eventos
-    |   |       +-- __init__.py
-    |   |       +-- evento_pedido.py   # Evento (ej. "CAMBIO_ESTADO")
-    |   |
-    |   +-- factory/               # Patron Factory Method (Creación de Usuarios)
-    |   |   +-- __init__.py
-    |   |   +-- usuario_factory.py   # Fábrica de Usuarios
-    |   |
-    |   +-- decorator/             # Patron Decorator (Cálculo de Costos)
-    |   |   +-- __init__.py
-    |   |   +-- i_costo.py           # Interfaz del Componente (ICosto)
-    |   |   +-- impl/                # Implementaciones
-    |   |       +-- __init__.py
-    |   |       +-- costo_base.py      # Componente Concreto
-    |   |       +-- costo_propina.py   # Decorador Concreto
-    |   |       +-- costo_prioritario.py # Decorador Concreto
-    |   |
-    |   +-- strategy/              # Patron Strategy (Asignación Logística)
-    |       +-- __init__.py
-    |       +-- i_estrategia_asignacion.py # Interfaz Strategy
-    |       +-- impl/
-    |           +-- __init__.py
-    |           +-- estrategia_asignar_mas_cercano.py
-    |           +-- estrategia_asignar_mas_libre.py
-    |
-    +-- notificaciones/            # Subsistema de Notificaciones (Observadores)
-    |   +-- __init__.py
-    |   +-- notificador_cliente.py   # Observador Concreto (envía Push/SMS)
-    |   +-- dashboard_admin.py     # Observador Concreto (actualiza dashboard)
-    |
-    +-- excepciones/               # Excepciones personalizadas
-        +-- __init__.py
-        +-- delivery_exception.py    # Excepcion base
-        +-- pedido_exception.py      # Errores de Pedido (ej. CancelarException)
-        +-- usuario_exception.py     # Errores de Usuario
-~~~
-
-## Módulos del Sistema
-
-El proyecto se organiza en los siguientes paquetes y módulos principales dentro de `parcial_delivery/`:
-
-* **`main.py`:** Punto de entrada del sistema. Actúa como la **Vista** (Capa de Presentación) y ejecuta la simulación completa del `README.md`.
-
-* **`entidades/`:** Paquete que contiene el **Modelo**. Son clases `@dataclass` (DTOs) que representan los objetos de negocio (`Pedido`, `Cliente`, `Repartidor`) sin lógica de negocio.
-
-* **`servicios/`:** Paquete que actúa como **Controlador**. Contiene la lógica de negocio central (`ServicioPedidos`, `ServicioLogistica`). Orquesta las entidades y los patrones para cumplir con las operaciones.
-
-* **`patrones/`:** Paquete "caja de herramientas". Contiene las implementaciones genéricas y reutilizables de todos los patrones de diseño (`State`, `Observer`, `Factory`, `Decorator`, `Strategy`).
-
-* **`notificaciones/`:** Paquete que contiene implementaciones concretas del patrón **Observer** (`NotificadorCliente`, `DashboardAdmin`). Son las clases que "escuchan" los eventos emitidos por el `Pedido`.
-
-* **`excepciones/`:** Paquete que define las excepciones personalizadas del dominio (ej. `PedidoCanceladoException`), permitiendo un manejo de errores robusto.

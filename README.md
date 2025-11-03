@@ -448,3 +448,85 @@ Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporciona
 ~~~bash
 python buscar_paquete.py integrar ParcialDelivery
 ~~~
+
+### Ejemplo Básico (Flujo de Pedido)
+
+Este ejemplo muestra cómo un pedido es creado, observado, avanzado y cómo se calcula su costo.
+
+~~~python
+# --- Ejemplo Básico de Flujo Completo ---
+from servicios.servicio_pedidos import ServicioPedidos
+from patrones.observer.notificador_cliente import NotificadorCliente
+from patrones.decorator.costo_prioritario import CostoPrioritario
+from patrones.decorator.costo_propina import CostoPropina
+
+# 1. Iniciar servicios
+servicio_pedidos = ServicioPedidos()
+
+# 2. Crear un pedido (Usa State y Factory internamente)
+pedido = servicio_pedidos.crear_pedido(
+    cliente="Valentín", 
+    items=["Pizza Muzza"],
+    costo_base=700.0
+)
+print(f"Pedido {pedido.id_pedido} creado en estado: {pedido.get_estado()}")
+
+# 3. Suscribir Observadores (Patrón Observer)
+notificador_valentin = NotificadorCliente(telefono="261-123456")
+servicio_pedidos.suscribir_a_pedido(pedido.id_pedido, notificador_valentin)
+
+# 4. Avanzar el pedido (Usa Patrón State)
+# El restaurante lo acepta
+servicio_pedidos.avanzar_estado_pedido(pedido.id_pedido)
+# El restaurante lo termina (esto notificará al 'notificador_valentin')
+servicio_pedidos.avanzar_estado_pedido(pedido.id_pedido) 
+
+# 5. Calcular costo final (Usa Patrón Decorator)
+# El cliente añade propina y envío prioritario
+costo_final = servicio_pedidos.calcular_costo_final(
+    id_pedido=pedido.id_pedido,
+    decoradores_config=[
+        {"tipo": CostoPrioritario},
+        {"tipo": CostoPropina, "porcentaje": 0.10} # 10% propina
+    ]
+)
+print(f"Costo final del pedido: ${costo_final}")
+~~~
+
+### Sistema de Asignación Logística (Patrón Strategy)
+
+Este ejemplo muestra cómo el `ServicioLogistica` usa el patrón Strategy para cambiar su algoritmo de asignación de repartidores en tiempo de ejecución.
+
+~~~python
+# --- Ejemplo de Asignación Logística (Patrón Strategy) ---
+from servicios.servicio_logistica import ServicioLogistica
+from patrones.strategy.estrategia_asignar_mas_cercano import EstrategiaAsignarMasCercano
+from patrones.strategy.estrategia_asignar_mas_libre import EstrategiaAsignarMasLibre
+from entidades.repartidor import Repartidor # (Suponiendo que existe esta entidad)
+from entidades.pedido import Pedido
+
+# 1. Crear repartidores (entidades)
+repartidor_A = Repartidor(id=1, nombre="Juan", ubicacion=(3,4), pedidos_activos=1)
+repartidor_B = Repartidor(id=2, nombre="Ana", ubicacion=(1,2), pedidos_activos=3)
+lista_repartidores = [repartidor_A, repartidor_B]
+
+# (Suponemos que el pedido está en ubicacion (1,1))
+pedido.ubicacion_restaurante = (1,1) 
+
+# 2. Iniciar servicio con estrategia por defecto (el más cercano)
+estrategia_cercania = EstrategiaAsignarMasCercano()
+servicio_log = ServicioLogistica(estrategia_default=estrategia_cercania)
+
+# 3. Asignar un pedido (usa Strategy "Mas Cercano")
+repartidor_asignado = servicio_log.asignar_repartidor(pedido, lista_repartidores)
+print(f"Estrategia 'Cercania' asigno a: {repartidor_asignado.nombre}") # Ana
+
+# 4. Cambiar la estrategia en caliente (Patrón Strategy)
+# (Ej. es hora pico, priorizamos repartidores libres)
+estrategia_libres = EstrategiaAsignarMasLibre()
+servicio_log.set_estrategia(estrategia_libres)
+
+# 5. Asignar otro pedido (usa Strategy "Mas Libre")
+repartidor_asignado_2 = servicio_log.asignar_repartidor(pedido, lista_repartidores)
+print(f"Estrategia 'Mas Libre' asigno a: {repartidor_asignado_2.nombre}") # Juan
+~~~

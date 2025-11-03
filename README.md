@@ -441,14 +441,6 @@ VISTA: Consultando estado: En Preparación
    ✓ Demostrado: El Patrón STATE sigue funcionando perfectamente.
 ~~~
 
-### Generación del Integrador (Entrega Final)
-
-Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporcionado por la cátedra) para consolidar todo el código fuente en un único archivo `integradorFinal.py`.
-
-~~~bash
-python buscar_paquete.py integrar ParcialDelivery
-~~~
-
 ### Ejemplo Básico (Flujo de Pedido)
 
 Este ejemplo muestra cómo un pedido es creado, observado, avanzado y cómo se calcula su costo.
@@ -529,4 +521,12 @@ servicio_log.set_estrategia(estrategia_libres)
 # 5. Asignar otro pedido (usa Strategy "Mas Libre")
 repartidor_asignado_2 = servicio_log.asignar_repartidor(pedido, lista_repartidores)
 print(f"Estrategia 'Mas Libre' asigno a: {repartidor_asignado_2.nombre}") # Juan
+~~~
+
+### Generación del Integrador (Entrega Final)
+
+Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporcionado por la cátedra) para consolidar todo el código fuente en un único archivo `integradorFinal.py`.
+
+~~~bash
+python buscar_paquete.py integrar ParcialDelivery
 ~~~

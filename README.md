@@ -132,47 +132,8 @@ El sistema está diseñado siguiendo los principios **SOLID** para asegurar un c
 
 ### Separación de Capas
 
-El proyecto sigue una arquitectura limpia de N-Capas, donde la comunicación fluye en una sola dirección (Vista -> Controlador -> Modelo).
-
-Asistente de programación
-Aquí tienes el código Markdown exacto para la sección "Arquitectura del Sistema", incluyendo los principios SOLID y el diagrama de capas.
-
-Cópialo y pégalo directamente en tu archivo README.md.
-
-Markdown
-## 4. Arquitectura del Sistema
-
-### Principios Arquitectónicos
-
-El sistema está diseñado siguiendo los principios **SOLID** para asegurar un código mantenible, escalable y robusto:
-
-* **Single Responsibility (SRP):** Cada clase tiene una única razón para cambiar.
-    * **Entidades:** Solo contienen datos (DTOs) y estado (ej. `Pedido`, `Cliente`).
-    * **Servicios:** Contienen la lógica de negocio reutilizable (ej. `ServicioPedidos`).
-    * **Patrones:** Implementaciones aisladas y genéricas (ej. `EstadoEnPreparacion`, `CostoPropina`).
-
-* **Open/Closed (OCP):** Abierto a extensión, cerrado a modificación.
-    * **Nuevos Estados:** Se puede agregar un `EstadoEnRevision` implementando `IEstadoPedido` sin modificar la clase `Pedido`.
-    * **Nuevas Estrategias:** Se puede agregar `EstrategiaAsignarPorRating` sin modificar el `ServicioLogistica`.
-    * **Nuevos Costos:** Se puede agregar un `CostoSeguro` (Patrón Decorator) sin modificar el `Pedido` o los otros costos.
-
-* **Liskov Substitution (LSP):** Subtipos intercambiables.
-    * Todos los estados (ej. `EstadoPendiente`, `EstadoEnCamino`) son sustituibles por su interfaz `IEstadoPedido`.
-    * Todas las estrategias de asignación (ej. `EstrategiaAsignarMasCercano`) son sustituibles por `IEstrategiaAsignacion`.
-    * Todos los decoradores de costo son sustituibles por la interfaz `ICosto`.
-
-* **Interface Segregation (ISP):** Interfaces específicas.
-    * `IObservador[T]`: Interfaz genérica para cualquier tipo de evento de notificación.
-    * `IEstadoPedido`: Interfaz específica para las acciones y transiciones de un pedido.
-    * `ICosto`: Interfaz específica para el cálculo de costos.
-
-* **Dependency Inversion (DIP):** Dependencia de abstracciones, no de implementaciones.
-    * El `ServicioLogistica` depende de la abstracción `IEstrategiaAsignacion`, no de una estrategia concreta.
-    * El `Pedido` depende de la abstracción `IEstadoPedido`.
-    * El `ServicioUsuarios` depende de `UsuarioFactory`, no de `Cliente` o `Repartidor`.
-
-### Separación de Capas
-
 El proyecto sigue una arquitectura limpia de N-Capas, donde la comunicación fluye en una sola dirección (Vista -> Controlador -> Modelo), similar a la estructura de `PythonForestal`.
 
+~~~
 +------------------------------+ | PRESENTACION (main.py) | | (Demostracion CLI / Vista) | +------------------------------+ | v +------------------------------+ | SERVICIOS (Controlador) | | (ServicioPedidos, | | ServicioLogistica, | | ServicioUsuarios) | +------------------------------+ | v +------------------------------+ | ENTIDADES (Modelo) | | (Pedido, Cliente, Repartidor)| +------------------------------+ | v +------------------------------+ | PATRONES / UTILIDADES | | (State, Observer, Factory, | | Decorator, Strategy) | +------------------------------+
+~~~

@@ -530,3 +530,112 @@ Antes de la entrega, se debe ejecutar el script `buscar_paquete.py` (proporciona
 ~~~bash
 python buscar_paquete.py integrar ParcialDelivery
 ~~~
+
+## 7. Estructura del Proyecto
+
+El proyecto sigue una arquitectura de N-Capas, separando las responsabilidades en paquetes y módulos.
+
+~~~
+ParcialDelivery/
+|
++-- main.py                      # Punto de entrada del sistema (Vista/Demo)
++-- README.md                    # Este archivo
++-- USER_STORIES.md              # (Pendiente) Historias de usuario detalladas
++-- buscar_paquete.py            # Script integrador (proporcionado por cátedra)
+|
++-- .venv/                       # Entorno virtual Python
+|
++-- parcial_delivery/            # Paquete principal del sistema
+    |
+    +-- __init__.py
+    +-- constantes.py            # Constantes (ej. COSTO_PRIORITARIO, ESTADO_PENDIENTE)
+    |
+    +-- entidades/                 # Objetos de dominio (Modelo / DTOs)
+    |   +-- __init__.py
+    |   |
+    |   +-- usuarios/              # Entidades de usuarios
+    |   |   +-- __init__.py
+    |   |   +-- usuario.py         # Clase base (dataclass)
+    |   |   +-- cliente.py         # Entidad Cliente
+    |   |   +-- repartidor.py      # Entidad Repartidor
+    |   |   +-- admin.py           # Entidad AdminRestaurante
+    |   |
+    |   +-- pedidos/               # Entidades de pedidos
+    |   |   +-- __init__.py
+    |   |   +-- pedido.py          # Entidad Pedido (Contexto del Patrón State)
+    |   |   +-- item_pedido.py     # Entidad Item
+    |   |
+    |   +-- logistica/             # Entidades de logística
+    |       +-- __init__.py
+    |       +-- restaurante.py     # Entidad Restaurante
+    |       +-- vehiculo.py        # Entidad Vehiculo
+    |
+    +-- servicios/                 # Lógica de negocio (Controlador)
+    |   +-- __init__.py
+    |   |
+    |   +-- pedidos/               # Servicios de gestión de pedidos
+    |   |   +-- __init__.py
+    |   |   +-- servicio_pedidos.py  # (Servicio de Dominio)
+    |   |
+    |   +-- usuarios/              # Servicios de gestión de usuarios
+    |   |   +-- __init__.py
+    |   |   +-- servicio_usuarios.py # (Servicio de Dominio)
+    |   |
+    |   +-- logistica/             # Servicios de alto nivel
+    |       +-- __init__.py
+    |       +-- servicio_logistica.py # (Servicio de Negocio - usa Strategy)
+    |
+    +-- patrones/                  # Implementaciones de patrones de diseño
+    |   +-- __init__.py
+    |   |
+    |   +-- state/                 # Patron State (Ciclo de vida del Pedido)
+    |   |   +-- __init__.py
+    |   |   +-- i_estado_pedido.py   # Interfaz del Estado
+    |   |   +-- impl/                # Implementaciones concretas
+    |   |       +-- __init__.py
+    |   |       +-- estado_pendiente.py
+    |   |       +-- estado_en_preparacion.py
+    |   |       +-- estado_en_camino.py
+    |   |       +-- estado_entregado.py
+    |   |       +-- estado_cancelado.py
+    |   |
+    |   +-- observer/              # Patron Observer (Notificaciones)
+    |   |   +-- __init__.py
+    |   |   +-- observable.py        # Clase Sujeto/Observable[T]
+    |   |   +-- observer.py          # Interfaz Observador/Observer[T]
+    |   |   +-- eventos/             # DTOs de eventos
+    |   |       +-- __init__.py
+    |   |       +-- evento_pedido.py   # Evento (ej. "CAMBIO_ESTADO")
+    |   |
+    |   +-- factory/               # Patron Factory Method (Creación de Usuarios)
+    |   |   +-- __init__.py
+    |   |   +-- usuario_factory.py   # Fábrica de Usuarios
+    |   |
+    |   +-- decorator/             # Patron Decorator (Cálculo de Costos)
+    |   |   +-- __init__.py
+    |   |   +-- i_costo.py           # Interfaz del Componente (ICosto)
+    |   |   +-- impl/                # Implementaciones
+    |   |       +-- __init__.py
+    |   |       +-- costo_base.py      # Componente Concreto
+    |   |       +-- costo_propina.py   # Decorador Concreto
+    |   |       +-- costo_prioritario.py # Decorador Concreto
+    |   |
+    |   +-- strategy/              # Patron Strategy (Asignación Logística)
+    |       +-- __init__.py
+    |       +-- i_estrategia_asignacion.py # Interfaz Strategy
+    |       +-- impl/
+    |           +-- __init__.py
+    |           +-- estrategia_asignar_mas_cercano.py
+    |           +-- estrategia_asignar_mas_libre.py
+    |
+    +-- notificaciones/            # Subsistema de Notificaciones (Observadores)
+    |   +-- __init__.py
+    |   +-- notificador_cliente.py   # Observador Concreto (envía Push/SMS)
+    |   +-- dashboard_admin.py     # Observador Concreto (actualiza dashboard)
+    |
+    +-- excepciones/               # Excepciones personalizadas
+        +-- __init__.py
+        +-- delivery_exception.py    # Excepcion base
+        +-- pedido_exception.py      # Errores de Pedido (ej. CancelarException)
+        +-- usuario_exception.py     # Errores de Usuario
+~~~

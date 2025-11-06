@@ -1,7 +1,7 @@
 # Parcial Patrones de Diseño - Sistema de Gestión de Delivery
-**Autor:** [Tu Apellido, Nombre]
-**Materia:** [Nombre de la Materia]
-**Profesor:** [Nombre del Profesor]
+**Autor:** [Soldati Lopez, Maximo]
+**Materia:** [diseño de sistemas]
+**Profesor:** [Alberto Cortez]
 
 ---
 
